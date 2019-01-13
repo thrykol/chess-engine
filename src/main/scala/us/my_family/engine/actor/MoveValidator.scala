@@ -16,6 +16,34 @@ object MoveValidator {
 
   case class InvalidMove(board: Board, from: Position, to: Position)
 
+  object Pieces {
+
+    object King {
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[King])
+    }
+
+    object Queen {
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Queen])
+    }
+
+    object Rook {
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Rook])
+    }
+
+    object Knight {
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Knight])
+    }
+
+    object Bishop {
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Bishop])
+    }
+
+    object Pawn {
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Pawn])
+    }
+
+  }
+
   object Moves {
 
     object Up {

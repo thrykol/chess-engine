@@ -1,7 +1,6 @@
 package us.my_family.engine.actor
 
-import us.my_family.engine
-import us.my_family.engine.actor.MoveValidator.ValidateMove
+import us.my_family.engine.actor.MoveValidator.Pieces
 
 trait BishopBehavior {
   this: MoveValidator with DiagonalMove =>
@@ -9,7 +8,7 @@ trait BishopBehavior {
   object Bishop {
 
     val isBishop: Receive = {
-      case ValidateMove(_, _: Some[engine.Bishop], _, _) => // no-op
+      case Pieces.Bishop =>
     }
 
     def receive: Receive = isBishop andThen DiagonalMove.receive

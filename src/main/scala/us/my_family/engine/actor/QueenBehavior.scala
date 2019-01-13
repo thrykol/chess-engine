@@ -1,7 +1,6 @@
 package us.my_family.engine.actor
 
-import us.my_family.engine
-import us.my_family.engine.actor.MoveValidator.ValidateMove
+import us.my_family.engine.actor.MoveValidator.Pieces
 
 trait QueenBehavior {
   this: MoveValidator with DiagonalMove with LinearMove =>
@@ -9,7 +8,7 @@ trait QueenBehavior {
   object Queen {
 
     val isQueen: Receive = {
-      case ValidateMove(_, _: Some[engine.Queen], _, _) => // no-op
+      case Pieces.Queen =>
     }
 
     def receive: Receive = isQueen andThen (DiagonalMove.receive orElse LinearMove.receive)

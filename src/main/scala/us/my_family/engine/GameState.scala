@@ -29,7 +29,7 @@ object GameState {
       */
     def move(from: Position, to: Position): Board = {
       val board = this.board
-      board(to.file)(to.rank) = board(from.file)(from.rank)
+      board(to.file)(to.rank) = board(from.file)(from.rank) map (_.move)
       board(from.file)(to.rank) = None
 
       this.copy(board = board)
