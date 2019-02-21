@@ -46,54 +46,73 @@ object MoveValidator {
 
   object Moves {
 
+    type Result = (Board, Option[Piece], Position, Position)
+
+    private implicit def commandToResult(m: ValidateMove): Result = (m.board, m.board.pieceAt(m.from), m.from, m.to)
+
     object Up {
       /**
         * Extracts the board, piece, position from, and position to of the piece is being moved up
         */
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.file == m.to.file && m.from.rank > m.to.rank).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.file == m.to.file && m.from.rank > m.to.rank).map(m => m: Result)
     }
 
     object Down {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.file == m.to.file && m.from.rank < m.to.rank).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.file == m.to.file && m.from.rank < m.to.rank).map(m => m: Result)
     }
 
     object Left {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.rank == m.to.rank && m.from.file > m.to.file).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank == m.to.rank && m.from.file > m.to.file).map(m => m: Result)
     }
 
     object Right {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.rank == m.to.rank && m.from.file < m.to.file).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank == m.to.rank && m.from.file < m.to.file).map(m => m: Result)
     }
 
     object UpLeft {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.rank > m.to.rank && m.from.file > m.to.file).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank > m.to.rank && m.from.file > m.to.file).map(m => m: Result)
     }
 
     object UpRight {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.rank > m.to.rank && m.from.file < m.to.file).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank > m.to.rank && m.from.file < m.to.file).map(m => m: Result)
     }
 
     object DownLeft {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.rank < m.to.rank && m.from.file > m.to.file).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank < m.to.rank && m.from.file > m.to.file).map(m => m: Result)
     }
 
     object DownRight {
-      def unapply(move: ValidateMove): Option[(Board, Option[Piece], Position, Position)] =
-        Some(move).filter(m => m.from.rank < m.to.rank && m.from.file < m.to.file).map(m => (m.board, m.board.pieceAt(m.from), m.from, m.to))
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank < m.to.rank && m.from.file < m.to.file).map(m => m: Result)
     }
 
+    object OneOnFile {
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.rank == m.to.rank && Math.abs(m.from.file - m.to.file) == 1).map(m => m: Result)
+    }
+
+    object OneOnRank {
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => m.from.file == m.to.file && Math.abs(m.from.rank - m.to.rank) == 1).map(m => m: Result)
+    }
+
+    object OneOnDiagonal {
+      def unapply(move: ValidateMove): Option[Result] =
+        Some(move).filter(m => Math.abs(move.from.file - move.to.file) == 1 && Math.abs(move.from.rank - move.to.rank) == 1).map(m => m: Result)
+    }
   }
 
 }
 
 class MoveValidator extends Actor
+  with KingBehavior
   with QueenBehavior
   with BishopBehavior
   with RookBehavior
@@ -108,7 +127,7 @@ class MoveValidator extends Actor
     case _ => true
   }
 
-  override def receive: Receive = Queen.receive orElse Bishop.receive orElse Rook.receive orElse invalidMove
+  override def receive: Receive = Queen.receive orElse Bishop.receive orElse Rook.receive orElse King.behavior orElse invalidMove
 
   def invalidMove: Receive = {
     case ValidateMove(board, from, to) => sendResult(board, from, to, isValid = false)
