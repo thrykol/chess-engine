@@ -11,7 +11,7 @@ trait QueenBehavior {
       case Pieces.Queen =>
     }
 
-    def receive: Receive = isQueen andThen (DiagonalMove.receive orElse LinearMove.receive)
+    def receive: Receive = isQueen andThen (DiagonalMove.behavior orElse LinearMove.receive)
 
   }
 

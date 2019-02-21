@@ -7,11 +7,9 @@ trait BishopBehavior {
 
   object Bishop {
 
-    val isBishop: Receive = {
-      case Pieces.Bishop =>
+    def receive: Receive = {
+      case move@Pieces.Bishop() if DiagonalMove.behavior.isDefinedAt(move) => DiagonalMove.behavior(move)
     }
-
-    def receive: Receive = isBishop andThen DiagonalMove.receive
   }
 
 }

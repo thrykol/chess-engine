@@ -9,26 +9,26 @@ trait DiagonalMove {
 
   object DiagonalMove {
 
-    def receive: Receive = {
+    def behavior: Receive = {
 
       case UpLeft(board, piece: Some[Piece], from, to) =>
         val distance = distanceOf(from, to)
-        val route = (0 until distance) map (d => board.pieceAt(Position(from.file - d, from.rank - d))) map (p => piece -> p) map validatePiece
+        val route = (1 until distance) map (d => board.pieceAt(Position(from.file - d, from.rank - d))) map (p => piece -> p) map validatePiece
 
         sendResult(board, from, to, route.dropWhile(_ == true).isEmpty)
       case UpRight(board, piece: Some[Piece], from, to) =>
         val distance = distanceOf(from, to)
-        val route = (0 until distance) map (d => board.pieceAt(Position(from.file + d, from.rank - d))) map (p => piece -> p) map validatePiece
+        val route = (1 until distance) map (d => board.pieceAt(Position(from.file + d, from.rank - d))) map (p => piece -> p) map validatePiece
 
         sendResult(board, from, to, route.dropWhile(_ == true).isEmpty)
       case DownLeft(board, piece: Some[Piece], from, to) =>
         val distance = distanceOf(from, to)
-        val route = (0 until distance) map (d => board.pieceAt(Position(from.file - d, from.rank + d))) map (p => piece -> p) map validatePiece
+        val route = (1 until distance) map (d => board.pieceAt(Position(from.file - d, from.rank + d))) map (p => piece -> p) map validatePiece
 
         sendResult(board, from, to, route.dropWhile(_ == true).isEmpty)
       case DownRight(board, piece: Some[Piece], from, to) =>
         val distance = distanceOf(from, to)
-        val route = (0 until distance) map (d => board.pieceAt(Position(from.file + d, from.rank + d))) map (p => piece -> p) map validatePiece
+        val route = (1 until distance) map (d => board.pieceAt(Position(from.file + d, from.rank + d))) map (p => piece -> p) map validatePiece
 
         sendResult(board, from, to, route.dropWhile(_ == true).isEmpty)
     }

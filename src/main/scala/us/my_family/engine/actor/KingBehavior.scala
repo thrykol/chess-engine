@@ -3,10 +3,7 @@ package us.my_family.engine.actor
 import us.my_family.engine.actor.MoveValidator.Pieces
 
 trait KingBehavior {
-  this: MoveValidator
-    with OneRank
-    with SingleSquareMove
-    with CastleMove =>
+  this: MoveValidator with SingleSquareMove with CastleMove =>
 
   object King {
 

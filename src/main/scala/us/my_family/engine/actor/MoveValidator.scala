@@ -1,6 +1,7 @@
 package us.my_family.engine.actor
 
 import akka.actor.{Actor, ActorLogging, Props}
+import akka.event.LoggingReceive
 import us.my_family.engine.GameState.{Board, Position}
 import us.my_family.engine._
 import us.my_family.engine.actor.MoveValidator.{InvalidMove, ValidMove, ValidateMove}
@@ -19,27 +20,29 @@ object MoveValidator {
   object Pieces {
 
     object King {
-      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[King])
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Piece.King])
     }
 
     object Queen {
-      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Queen])
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Piece.Queen])
     }
 
     object Rook {
-      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Rook])
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Piece.Rook])
     }
 
     object Knight {
-      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Knight])
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Piece.Knight])
     }
 
     object Bishop {
-      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Bishop])
+      def unapply(move: ValidateMove): Boolean = {
+        move.board.pieceAt(move.from).exists(_.isInstanceOf[Piece.Bishop])
+      }
     }
 
     object Pawn {
-      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Pawn])
+      def unapply(move: ValidateMove): Boolean = move.board.pieceAt(move.from).exists(_.isInstanceOf[Piece.Pawn])
     }
 
   }
@@ -107,6 +110,7 @@ object MoveValidator {
       def unapply(move: ValidateMove): Option[Result] =
         Some(move).filter(m => Math.abs(move.from.file - move.to.file) == 1 && Math.abs(move.from.rank - move.to.rank) == 1).map(m => m: Result)
     }
+
   }
 
 }
@@ -118,19 +122,25 @@ class MoveValidator extends Actor
   with RookBehavior
   with DiagonalMove
   with LinearMove
+  with SingleSquareMove
+  with CastleMove
   with ActorLogging {
 
   protected val validatePiece: PartialFunction[(Option[Piece], Option[Piece]), Boolean] = {
-    case (Some(_: White), Some(_: White)) => false
-    case (Some(_: Black), Some(_: Black)) => false
-    case (_, Some(_: King)) => false // Can't capture opponent's king
+    case (Some(_: White), Some(_: White)) => log.debug("white on white attack")
+      false
+    case (Some(_: Black), Some(_: Black)) => log.debug("black on black attack")
+      false
+    case (_, Some(_: Piece.King)) => log.debug("can't capture king")
+      false // Can't capture opponent's king
     case _ => true
   }
 
   override def receive: Receive = Queen.receive orElse Bishop.receive orElse Rook.receive orElse King.behavior orElse invalidMove
 
-  def invalidMove: Receive = {
-    case ValidateMove(board, from, to) => sendResult(board, from, to, isValid = false)
+  def invalidMove: Receive = LoggingReceive.withLabel("invalid move") {
+    case ValidateMove(board, from, to) =>
+      sendResult(board, from, to, isValid = false)
   }
 
   def sendResult(board: Board, from: Position, to: Position, isValid: Boolean): Unit = {

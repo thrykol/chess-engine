@@ -1,6 +1,7 @@
 package us.my_family.engine
 
 import us.my_family.engine.GameState.{Board, Position}
+import us.my_family.engine.Piece._
 
 object GameState {
 
@@ -34,6 +35,8 @@ object GameState {
 
       this.copy(board = board)
     }
+
+    def state: Array[Array[Option[Piece]]] = board.clone()
   }
 
   case class Position(file: Int, rank: Int) {
@@ -75,6 +78,12 @@ object GameState {
     }
 
     def apply() = new Board()
+
+    def apply(piece: Piece with Color, pos: Position) = {
+      val b = new Board(Array.fill[Option[Piece]](8, 8)(None))
+      b.board(pos.file)(pos.rank) = Some(piece)
+      b
+    }
   }
 
 }

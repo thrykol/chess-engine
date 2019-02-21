@@ -1,5 +1,7 @@
 package us.my_family.engine
 
+import us.my_family.engine.Piece._
+
 import scala.reflect.runtime.universe._
 
 sealed trait Piece {
@@ -50,38 +52,39 @@ object Piece {
     case (c, p) if c =:= typeOf[White] && p =:= typeOf[Pawn] => new Pawn(hasMoved) with White
     case (c, p) if c =:= typeOf[Black] && p =:= typeOf[Pawn] => new Pawn(hasMoved) with Black
   }
+
+  case class King protected(override val moved: Boolean) extends Piece {
+    val symbol = Some('K')
+    val value: Option[Int] = None
+  }
+
+  case class Queen protected(override val moved: Boolean) extends Piece {
+    val symbol = Some('Q')
+    val value = Some(9)
+  }
+
+  case class Rook protected(override val moved: Boolean) extends Piece {
+    val symbol = Some('R')
+    val value = Some(5)
+  }
+
+  case class Knight protected(override val moved: Boolean) extends Piece {
+    val symbol = Some('N')
+    val value = Some(3)
+  }
+
+  case class Bishop protected(override val moved: Boolean) extends Piece {
+    val symbol = Some('B')
+    val value = Some(3)
+  }
+
+  case class Pawn protected(override val moved: Boolean) extends Piece {
+    val symbol: Option[Char] = None
+    val value = Some(1)
+  }
+
 }
 
 trait White extends Color
 
 trait Black extends Color
-
-case class King private(override val moved: Boolean) extends Piece {
-  val symbol = Some('K')
-  val value: Option[Int] = None
-}
-
-case class Queen private(override val moved: Boolean) extends Piece {
-  val symbol = Some('Q')
-  val value = Some(9)
-}
-
-case class Rook private(override val moved: Boolean) extends Piece {
-  val symbol = Some('R')
-  val value = Some(5)
-}
-
-case class Knight private(override val moved: Boolean) extends Piece {
-  val symbol = Some('N')
-  val value = Some(3)
-}
-
-case class Bishop private(override val moved: Boolean) extends Piece {
-  val symbol = Some('B')
-  val value = Some(3)
-}
-
-case class Pawn private(override val moved: Boolean) extends Piece {
-  val symbol: Option[Char] = None
-  val value = Some(1)
-}
