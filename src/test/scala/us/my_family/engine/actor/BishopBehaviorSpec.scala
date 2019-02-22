@@ -8,7 +8,7 @@ import us.my_family.engine.Piece.Bishop
 import us.my_family.engine.actor.MoveValidator.{InvalidMove, ValidMove, ValidateMove}
 import us.my_family.engine.{Black, Color, Piece}
 
-class BishopBehaviorSpec extends TestKit(ActorSystem("MySpec")) with ImplicitSender
+class BishopBehaviorSpec extends TestKit(ActorSystem("BishopBehaviorSpec")) with ImplicitSender
   with WordSpecLike with Matchers with BeforeAndAfterAll {
 
   val moving: AfterWord = afterWord("moving")
@@ -18,7 +18,7 @@ class BishopBehaviorSpec extends TestKit(ActorSystem("MySpec")) with ImplicitSen
   }
 
   trait ValidatorActor {
-    lazy val board: Board = Board(bishop, from)
+    lazy val board: Board = Board(bishop -> from)
     val actorRef: ActorRef = system.actorOf(MoveValidator.props())
     val bishop: Piece with Color = Piece[Black, Bishop]
 

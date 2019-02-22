@@ -13,7 +13,11 @@ trait KingBehavior {
 
     // TODO: Check for castling
     // TODO: Test for 'check'
-    def behavior: Receive = isKing andThen (SingleSquareMove.receive orElse CastleMove.behavior)
+    val moves: Receive = SingleSquareMove.behavior orElse CastleMove.behavior
+
+    def behavior: Receive = {
+      case move@Pieces.King() if moves.isDefinedAt(move) => moves(move)
+    }
   }
 
 }

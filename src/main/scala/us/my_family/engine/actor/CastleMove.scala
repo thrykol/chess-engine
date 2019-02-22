@@ -12,18 +12,16 @@ trait CastleMove {
     def behavior: Receive = {
       case Left(board, Some(piece: King), from, to) =>
         lazy val firstKingMove = !piece.moved
-        lazy val firstRookMove = board.pieceAt(Position(0, from.rank)).collect { case r: Rook => r.moved }.contains(true)
-        lazy val routeClear = (1 until 4).flatMap(f => board.pieceAt(Position(f, from.rank))).isEmpty
-        lazy val notCheck = false // TODO: test for check on each placement
-
+        lazy val firstRookMove = board.pieceAt(Position(0, from.rank)).collect { case r: Rook => !r.moved }.contains(true)
+        lazy val routeClear = (1 until 3).flatMap(f => board.pieceAt(Position(f, from.rank))).isEmpty
+        lazy val notCheck = true // TODO: test for check on each placement
 
         sendResult(board, from, to, firstKingMove && firstRookMove && routeClear && notCheck)
       case Right(board, Some(piece: King), from, to) =>
         lazy val firstKingMove = !piece.moved
-        lazy val firstRookMove = board.pieceAt(Position(7, from.rank)).collect { case r: Rook => r.moved }.contains(true)
-        lazy val routeClear = (5 until 7).flatMap(f => board.pieceAt(Position(f, from.rank))).isEmpty
-        lazy val notCheck = false // TODO: test for check on each placement
-
+        lazy val firstRookMove = board.pieceAt(Position(7, from.rank)).collect { case r: Rook => !r.moved }.contains(true)
+        lazy val routeClear = (5 until 6).flatMap(f => board.pieceAt(Position(f, from.rank))).isEmpty
+        lazy val notCheck = true // TODO: test for check on each placement
 
         sendResult(board, from, to, firstKingMove && firstRookMove && routeClear && notCheck)
     }

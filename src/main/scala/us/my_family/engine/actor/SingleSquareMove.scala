@@ -8,7 +8,7 @@ trait SingleSquareMove {
 
   object SingleSquareMove {
 
-    def receive: Receive = {
+    def behavior: Receive = {
       case OneOnFile(board, piece: Some[Piece], from, to) =>
         sendResult(board, from, to, validatePiece(piece -> board.pieceAt(to)))
       case OneOnRank(board, piece: Some[Piece], from, to) =>
