@@ -29,9 +29,9 @@ object GameState {
       * @param to   Destination of the piece
       */
     def move(from: Position, to: Position): Board = {
-      val board = this.board
+      val board = this.board.clone()
       board(to.file)(to.rank) = board(from.file)(from.rank) map (_.move)
-      board(from.file)(to.rank) = None
+      board(from.file)(from.rank) = None
 
       this.copy(board = board)
     }
@@ -77,12 +77,15 @@ object GameState {
       board
     }
 
-    def apply() = new Board()
+    def apply(pieces: (Piece with Color, Position)*): Board = {
+      if (pieces.nonEmpty) {
+        val board = new Board(Array.fill[Option[Piece]](8, 8)(None))
 
-    def apply(piece: Piece with Color, pos: Position) = {
-      val b = new Board(Array.fill[Option[Piece]](8, 8)(None))
-      b.board(pos.file)(pos.rank) = Some(piece)
-      b
+        pieces foreach { case (piece, position) => board.board(position.file)(position.rank) = Some(piece) }
+        board
+      } else {
+        new Board()
+      }
     }
   }
 
